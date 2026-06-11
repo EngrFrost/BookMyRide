@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../services/api'
 import type { Booking } from '../types'
 import { BookingCard, CancelBookingModal } from '../components/booking'
-import { Button, GlassCard, Skeleton, Tabs, toast } from '../components/ui'
+import { Button, ErrorState, GlassCard, Skeleton, Tabs, toast } from '../components/ui'
 
 type Filter = 'ALL' | 'UPCOMING' | 'COMPLETED' | 'CANCELLED'
 
@@ -28,12 +28,20 @@ function matchesFilter(booking: Booking, filter: Filter, now: number): boolean {
 
 export function MyBookings() {
   const [bookings, setBookings] = useState<Booking[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<Filter>('ALL')
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null)
 
   const load = useCallback(async () => {
-    const data = await api.listMyBookings()
-    setBookings(data)
+    setError(null)
+    setBookings(null)
+    try {
+      const data = await api.listMyBookings()
+      setBookings(data)
+    } catch {
+      setError('Could not load your bookings. Please try again.')
+      setBookings([])
+    }
   }, [])
 
   useEffect(() => {
@@ -88,25 +96,32 @@ export function MyBookings() {
         <Tabs tabs={filterTabs} value={filter} onChange={setFilter} />
       </div>
 
+      {error && (
+        <div className="mt-8">
+          <ErrorState message={error} onRetry={() => void load()} />
+        </div>
+      )}
+
       <div className="mt-8 grid gap-6 md:grid-cols-2">
-        {filtered === null
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="h-24 w-full" />
-                <Skeleton className="h-5 w-2/3" />
-              </div>
-            ))
-          : filtered.map((booking) => (
-              <BookingCard
-                key={booking.id}
-                booking={booking}
-                showRebook
-                onCancel={canCancelBooking(booking) ? setCancelTarget : undefined}
-              />
-            ))}
+        {!error &&
+          (filtered === null
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="h-24 w-full" />
+                  <Skeleton className="h-5 w-2/3" />
+                </div>
+              ))
+            : filtered.map((booking) => (
+                <BookingCard
+                  key={booking.id}
+                  booking={booking}
+                  showRebook
+                  onCancel={canCancelBooking(booking) ? setCancelTarget : undefined}
+                />
+              )))}
       </div>
 
-      {filtered !== null && filtered.length === 0 && (
+      {!error && filtered !== null && filtered.length === 0 && (
         <GlassCard className="mt-8 p-12 text-center">
           <p className="text-headline-sm text-on-surface-variant">No bookings found</p>
           <p className="mt-2 text-body-md text-on-surface-variant">

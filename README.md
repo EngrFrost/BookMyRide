@@ -47,7 +47,9 @@ API base: `http://localhost:3000/api`
 | `POST /bookings` | Firebase token |
 | `GET /admin/stats` | Admin |
 
-The frontend still uses mock data (`VITE_USE_MOCK=true`). Phase 6 wires `httpApi.ts`.
+Production uses the real API (`VITE_USE_MOCK=false`). Local dev can use mock (`VITE_USE_MOCK=true`) or wire to the backend via `client/.env.development.local`.
+
+**CI:** GitHub Actions runs client lint/build and server lint/build/test on every push to `main`.
 
 Handy while demoing:
 

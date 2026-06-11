@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  client:
+    name: Client — lint & build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  server:
+    name: Server — lint, build & test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: bookmyride
+          POSTGRES_PASSWORD: bookmyride_dev_pw
+          POSTGRES_DB: bookmyride
+        ports:
+          - 5434:5432
+        options: >-
+          --health-cmd "pg_isready -U bookmyride -d bookmyride"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://bookmyride:bookmyride_dev_pw@localhost:5434/bookmyride?schema=public
+      CORS_ORIGIN: http://localhost:5173
+      FIREBASE_PROJECT_ID: ci-placeholder
+      FIREBASE_CLIENT_EMAIL: ci@example.com
+      FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nMII=\n-----END PRIVATE KEY-----\n"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npx eslint "{src,apps,libs,test}/**/*.ts"
+      - run: npm run build
+      - run: npm test -- --passWithNoTests

@@ -193,29 +193,43 @@ First commit pushed to [github.com/EngrFrost/BookMyRide](https://github.com/Engr
 
 ---
 
-## Phase 7 — Notifications, PWA & Polish
+## Phase 7 — PWA, UX, Security & CI/CD
 
-> Goal: production-ready.
+> Goal: production-ready (notifications deferred to backlog).
 
 ### Tasks
 
-**Notifications**
-- [ ] Notifications module (channel abstraction); `Notification` Prisma model
-- [ ] Email (Nodemailer/SendGrid): confirmation, cancellation, 24h-before reminder (cron)
-- [ ] Web Push: VAPID keys, subscribe endpoint, service worker push handler, sensible permission prompt timing
-- [ ] In-app bell: unread count, dropdown, mark-as-read; toasts on live events
+**PWA**
+- [x] Workbox runtime caching (API network-first, images cache-first), offline fallback, install prompt
+- [x] Manifest icons (SVG), `offline.html`, `no-cache` for `index.html` in nginx deploy
 
-**PWA & polish**
-- [ ] Workbox runtime caching (API network-first, assets cache-first), offline fallback, custom install prompt, final icons
-- [ ] Framer Motion page transitions + micro-animations (button glow, card hovers) per design system
-- [ ] Accessibility audit (ARIA, focus, keyboard nav, contrast on glass surfaces)
-- [ ] Security pass: rate limiting, helmet, input validation review
-- [ ] Deployment (target TBD): Dockerfiles, production compose or platform config, CI (lint + build + test)
+**UX & accessibility**
+- [x] Framer Motion page transitions; loading skeletons + API error states with retry
+- [x] Skip link, `main` landmark, focus-visible on interactive elements
+
+**Security**
+- [x] Helmet security headers, `@nestjs/throttler` rate limiting (health exempt)
+- [x] Validation pipe already enforced globally (`whitelist`, `forbidNonWhitelisted`)
+
+**CI/CD**
+- [x] GitHub Actions: client lint + build; server lint + build + unit tests (Postgres service)
 
 ### Exit criteria
 
-- Booking create/cancel fires email + push + bell
-- Lighthouse: installable PWA, performance ≥ 90 on key pages
+- Installable PWA with offline fallback page
+- CI green on push/PR
+- Security headers + rate limits on API
+
+---
+
+## Backlog — Notifications (last)
+
+> Implement after Phase 7 exit criteria are met.
+
+- [ ] Notifications module (channel abstraction); `Notification` Prisma model
+- [ ] Email (Nodemailer/SendGrid): confirmation, cancellation, 24h-before reminder (cron)
+- [ ] Web Push: VAPID keys, subscribe endpoint, service worker push handler
+- [ ] In-app bell: unread count, dropdown, mark-as-read
 
 ---
 

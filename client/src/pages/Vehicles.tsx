@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { api } from '../services/api'
 import type { Vehicle, VehicleCategory } from '../types'
 import { VEHICLE_CATEGORY_LABELS } from '../types'
-import { Input, Skeleton, Tabs } from '../components/ui'
+import { ErrorState, Input, Skeleton, Tabs } from '../components/ui'
 import { VehicleCard } from '../components/vehicle/VehicleCard'
 
 type CategoryFilter = 'ALL' | VehicleCategory
@@ -24,16 +24,20 @@ export function Vehicles() {
       : 'ALL'
 
   const [vehicles, setVehicles] = useState<Vehicle[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    let cancelled = false
-    api.listVehicles().then((v) => {
-      if (!cancelled) setVehicles(v)
+  const load = () => {
+    setError(null)
+    setVehicles(null)
+    return api.listVehicles().then(setVehicles).catch(() => {
+      setError('Could not load vehicles. Check your connection and try again.')
+      setVehicles([])
     })
-    return () => {
-      cancelled = true
-    }
+  }
+
+  useEffect(() => {
+    void load()
   }, [])
 
   const filtered = useMemo(() => {
@@ -72,19 +76,26 @@ export function Vehicles() {
         </div>
       </div>
 
+      {error && (
+        <div className="mt-8">
+          <ErrorState message={error} onRetry={() => void load()} />
+        </div>
+      )}
+
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered === null
-          ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="space-y-3">
-                <Skeleton className="aspect-[16/10] w-full" />
-                <Skeleton className="h-5 w-2/3" />
-                <Skeleton className="h-4 w-1/3" />
-              </div>
-            ))
-          : filtered.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />)}
+        {!error &&
+          (filtered === null
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="aspect-[16/10] w-full" />
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-1/3" />
+                </div>
+              ))
+            : filtered.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />))}
       </div>
 
-      {filtered !== null && filtered.length === 0 && (
+      {!error && filtered !== null && filtered.length === 0 && (
         <div className="glass mt-8 p-12 text-center">
           <p className="text-headline-sm text-on-surface-variant">No vehicles found</p>
           <p className="mt-2 text-body-md text-on-surface-variant">

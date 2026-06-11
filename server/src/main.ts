@@ -2,12 +2,20 @@ import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { mkdirSync } from 'fs'
+import helmet from 'helmet'
 import { join } from 'path'
 import { AppModule } from './app.module'
 import { VehiclesService } from './vehicles/vehicles.service'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
+
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+    }),
+  )
 
   mkdirSync(VehiclesService.uploadsDir(), { recursive: true })
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
