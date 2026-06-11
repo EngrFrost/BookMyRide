@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(uuid())
+  firebaseUid   String    @unique
+  email         String    @unique
+  displayName   String
+  photoUrl      String?
+  role          Role      @default(CUSTOMER)
+  isActive      Boolean   @default(true)
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model Vehicle {
+  id          String          @id @default(uuid())
+  name        String          @unique
+  category    VehicleCategory
+  description String?
+  imageUrl    String?
+  status      VehicleStatus   @default(AVAILABLE)
+  bookings    Booking[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+enum VehicleCategory {
+  BIKE
+  FOUR_SEATER
+  SEVEN_SEATER
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  MAINTENANCE
+  RETIRED
+}
+
+model Booking {
+  id                 String        @id @default(uuid())
+  userId             String
+  vehicleId          String
+  bookingDate        DateTime
+  startTime          DateTime
+  endTime            DateTime
+  status             BookingStatus @default(CONFIRMED)
+  cancellationReason String?
+  cancelledBy        CancelledBy?
+  user               User          @relation(fields: [userId], references: [id])
+  vehicle            Vehicle       @relation(fields: [vehicleId], references: [id])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@unique([vehicleId, startTime])
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum CancelledBy {
+  CUSTOMER
+  ADMIN
+}
+
+model AppSettings {
+  id                       String @id @default("default")
+  maxAdvanceBookingDays    Int    @default(7)
+  maxActiveBookingsPerUser Int    @default(2)
+  minHoursBeforeBooking    Int    @default(24)
+  cancellationWindowHours  Int    @default(24)
+}

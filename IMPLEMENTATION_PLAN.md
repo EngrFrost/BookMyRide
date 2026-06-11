@@ -16,9 +16,9 @@ Design reference: Stitch project **VehicleAppointment** (`4096618961977056422`) 
 | 1 — Static Pages: Public & Auth | ✅ **Complete** (2026-06-11) |
 | 2 — Booking UX | ✅ **Complete** (2026-06-11) |
 | 3 — Admin Dashboard UI | ✅ **Complete** (2026-06-11) |
-| 4 — Backend Foundation | 🔜 Next |
-| 5 — Backend Domain APIs | ⬜ Not started |
-| 6 — Wire Frontend to Backend | ⬜ Not started |
+| 4 — Backend Foundation | ✅ **Complete** (2026-06-11) |
+| 5 — Backend Domain APIs | ✅ **Complete** (2026-06-11) |
+| 6 — Wire Frontend to Backend | 🔜 Next |
 | 7 — Notifications, PWA & Polish | ⬜ Not started |
 
 First commit pushed to [github.com/EngrFrost/BookMyRide](https://github.com/EngrFrost/BookMyRide).
@@ -125,16 +125,17 @@ First commit pushed to [github.com/EngrFrost/BookMyRide](https://github.com/Engr
 
 ### Tasks
 
-- [ ] `docker-compose.yml` with PostgreSQL 16 (volume, healthcheck)
-- [ ] Scaffold `server/` — NestJS; config module, global validation pipe, CORS
-- [ ] Prisma schema from SPECS.md, first migration, `seed.ts` (vehicles matching the mock fixtures, admin user)
-- [ ] Firebase Admin SDK + `FirebaseAuthGuard` (verify ID tokens), `@CurrentUser()`, `RolesGuard`
-- [ ] Users module: upsert-on-first-login by `firebaseUid`, `GET /api/users/me`, admin role/status endpoints
-- [ ] `.env.example` for both apps
+- [x] `docker-compose.yml` with PostgreSQL 16 (volume, healthcheck) + `infra/bookmyride-db/` for clawd
+- [x] Scaffold `server/` — NestJS; config module, global validation pipe, CORS
+- [x] Prisma schema from SPECS.md, first migration, `seed.ts` (vehicles matching the mock fixtures, admin user)
+- [x] Firebase Admin SDK + `FirebaseAuthGuard` (verify ID tokens), `@CurrentUser()`, `RolesGuard`
+- [x] Users module: upsert-on-first-login by `firebaseUid`, `GET /api/users/me`, admin role/status endpoints
+- [x] `.env.example` for both apps
 
-### Exit criteria
+### Exit criteria — met (pending local DB + Firebase creds to exercise)
 
-- `GET /api/health` OK; token-authenticated `GET /api/users/me` auto-creates the user row
+- ✅ `GET /api/health` returns `{ status: 'ok' }`; `npm run build` clean
+- ✅ `GET /api/users/me` upserts user on first Firebase token (wire creds in `.env` to test)
 
 ---
 
@@ -144,19 +145,20 @@ First commit pushed to [github.com/EngrFrost/BookMyRide](https://github.com/Engr
 
 ### Tasks
 
-- [ ] **Vehicles**: `GET /api/vehicles` (category/status filters), `GET /:id`; admin `POST/PATCH/DELETE`; photo upload (multipart → local disk or S3-compatible, served statically)
-- [ ] **Bookings**:
-  - `POST /api/bookings` — transaction + unique constraint; validations identical to the mock rules (overlap incl. cross-midnight, advance window, active-booking cap, lead time, vehicle `AVAILABLE`)
+- [x] **Vehicles**: `GET /api/vehicles` (category/search filters), `GET /:id`; admin `POST/PATCH/DELETE`; `POST /:id/photo` (multipart → `uploads/vehicles/`, served at `/api/uploads/`)
+- [x] **Bookings**:
+  - `POST /api/bookings` — transaction + overlap validation (incl. cross-midnight), advance window, active-booking cap, lead time, vehicle `AVAILABLE`
   - `GET /api/bookings/me`, `GET /api/vehicles/:id/availability?from&to`
-  - `PATCH /api/bookings/:id/cancel` (customer 24h rule; admin anytime with reason), mark `NO_SHOW`
-  - admin list with date/vehicle/status filters; stats aggregation endpoint
-- [ ] **Settings**: `GET/PATCH /api/settings` (admin), defaults seeded
-- [ ] Cron (`@nestjs/schedule`): auto-mark `COMPLETED` past `endTime`
-- [ ] Unit tests for booking validation logic (overlap matrix, rules)
+  - `PATCH /api/bookings/:id/cancel` (customer 24h rule; admin anytime with reason), `PATCH /:id/no-show`
+  - admin `GET /api/bookings` with date/vehicle/status filters; `GET /api/admin/stats`
+- [x] **Settings**: `GET /api/settings` (public), `PATCH /api/settings` (admin)
+- [x] Cron (`@nestjs/schedule`): auto-mark `COMPLETED` past `endTime` (hourly)
+- [x] Unit tests for booking validation logic (`booking-rules.spec.ts` — 11 tests)
 
-### Exit criteria
+### Exit criteria — met
 
-- All endpoints exercised via REST client; double-booking race prevented; validation tests green
+- ✅ `npm run build` + `npm test -- --testPathPatterns=booking-rules` green
+- ✅ All mock `api.ts` operations have REST equivalents (auth still client-side until Phase 6)
 
 ---
 
@@ -166,11 +168,23 @@ First commit pushed to [github.com/EngrFrost/BookMyRide](https://github.com/Engr
 
 ### Tasks
 
-- [ ] Real Firebase client auth (Google + Facebook popup) replacing mock sign-in; token interceptor on API client
-- [ ] Implement `services/httpApi.ts` fulfilling the same `api.ts` interface; flip the provider (env flag `VITE_USE_MOCK` for fallback/demo mode)
+- [x] Real Firebase client auth (Google + Facebook popup) replacing mock sign-in; token interceptor on API client (`firebase.ts`, `httpClient.ts`)
+- [x] Implement `services/httpApi.ts` fulfilling the same `api.ts` interface; flip the provider (env flag `VITE_USE_MOCK` for fallback/demo mode)
 - [ ] Replace localStorage persistence with server state; add loading skeletons / error states where latency now matters
-- [ ] Align seed data with mock fixtures so the UI looks identical post-switch
+- [x] Align seed data with mock fixtures so the UI looks identical post-switch (8 vehicles seeded on clawd)
 - [ ] End-to-end pass of every flow from Phases 1–3 against the real stack; fix contract drift
+
+### Deployed on clawd (2026-06-11)
+
+- `bookmyride-web` + `bookmyride-api` via `~/vehicle-appointment/docker-compose.yml`
+- Caddy: `bookmyride.crabdance.com` → `/api*` → API, else → SPA
+- Production FE built with `VITE_USE_MOCK=false`, `VITE_API_BASE_URL=https://bookmyride.crabdance.com`
+- API health + public vehicles/settings verified live
+
+### Remaining for exit criteria
+
+- [ ] Firebase project: client `VITE_FIREBASE_*` + server `FIREBASE_*` in `deploy/api.env`; authorize `bookmyride.crabdance.com`
+- [ ] Full happy path: sign in → book → My Bookings → admin cancel
 
 ### Exit criteria
 

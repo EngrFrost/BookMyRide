@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  bookmyride-web:
+    image: nginx:alpine
+    container_name: bookmyride-web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+      - ./nginx-spa.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - infra_infra_network
+
+  bookmyride-api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: bookmyride-api:latest
+    container_name: bookmyride-api
+    restart: unless-stopped
+    env_file:
+      - ./api.env
+    volumes:
+      - api_uploads:/app/uploads
+    networks:
+      - infra_infra_network
+      - bookmyride_db_net
+
+networks:
+  infra_infra_network:
+    external: true
+    name: infra_infra_network
+  bookmyride_db_net:
+    external: true
+    name: bookmyride-db_default
+
+volumes:
+  api_uploads:

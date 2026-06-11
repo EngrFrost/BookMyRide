@@ -6,6 +6,9 @@ import type {
   Vehicle,
   VehicleCategory,
 } from '../types'
+import { isMockMode } from './config'
+import { mockApi } from './mockApi'
+import { httpApi } from './httpApi'
 
 /**
  * The single data contract for the whole app.
@@ -44,19 +47,16 @@ export interface AdminStats {
 }
 
 export interface Api {
-  // Auth (mocked until Phase 6)
   signIn(provider: 'google' | 'facebook'): Promise<User>
   signOut(): Promise<void>
   getCurrentUser(): Promise<User | null>
 
-  // Vehicles
   listVehicles(filters?: VehicleFilters): Promise<Vehicle[]>
   getVehicle(id: string): Promise<Vehicle>
   createVehicle(input: Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>): Promise<Vehicle>
   updateVehicle(id: string, input: Partial<Omit<Vehicle, 'id'>>): Promise<Vehicle>
   deleteVehicle(id: string): Promise<void>
 
-  // Bookings
   createBooking(input: CreateBookingInput): Promise<Booking>
   listMyBookings(): Promise<Booking[]>
   listAllBookings(filters?: BookingFilters): Promise<Booking[]>
@@ -64,20 +64,14 @@ export interface Api {
   markNoShow(id: string): Promise<Booking>
   getVehicleAvailability(vehicleId: string, from: string, to: string): Promise<BookedWindow[]>
 
-  // Users (admin)
   listUsers(): Promise<User[]>
   updateUserRole(id: string, role: User['role']): Promise<User>
   setUserActive(id: string, isActive: boolean): Promise<User>
 
-  // Settings
   getSettings(): Promise<AppSettings>
   updateSettings(input: Partial<AppSettings>): Promise<AppSettings>
 
-  // Admin stats
   getAdminStats(): Promise<AdminStats>
 }
 
-import { mockApi } from './mockApi'
-
-// Phase 6 will switch on import.meta.env.VITE_USE_MOCK
-export const api: Api = mockApi
+export const api: Api = isMockMode() ? mockApi : httpApi

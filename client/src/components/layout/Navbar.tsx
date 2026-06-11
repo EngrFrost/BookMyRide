@@ -16,8 +16,8 @@ function BrandLogo() {
     <Link to="/" className="flex items-center gap-2">
       <img src="/favicon.svg" alt="" className="h-8 w-8" />
       <span className="text-headline-sm font-extrabold tracking-tight text-primary">
-        Vehicle<span className="text-on-surface">Appointment</span>
-      </span>
+          Book<span className="text-on-surface">myride</span>
+        </span>
     </Link>
   )
 }

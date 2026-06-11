@@ -1,0 +1,25 @@
+version: '3.8'
+
+# Dedicated Postgres for BookMyRide on clawd (separate from shared infra postgres).
+# Run: docker-compose up -d
+services:
+  bookmyride-db:
+    image: postgres:16-alpine
+    container_name: bookmyride-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bookmyride
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bookmyride_dev_pw}
+      POSTGRES_DB: bookmyride
+    ports:
+      - '5434:5432'
+    volumes:
+      - bookmyride_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bookmyride -d bookmyride']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bookmyride_pg_data:

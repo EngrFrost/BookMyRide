@@ -1,0 +1,24 @@
+version: '3.8'
+
+# Local dev database only. Production DB runs from infra/bookmyride-db/ on clawd.
+services:
+  bookmyride-db:
+    image: postgres:16-alpine
+    container_name: bookmyride-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bookmyride
+      POSTGRES_PASSWORD: bookmyride_dev_pw
+      POSTGRES_DB: bookmyride
+    ports:
+      - '5434:5432'
+    volumes:
+      - bookmyride_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bookmyride -d bookmyride']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bookmyride_pg_data:

@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { GlassCard, toast } from '../components/ui'
 import { useAuthStore } from '../store/auth'
+import { isMockMode } from '../services/config'
+import { isFirebaseConfigured } from '../services/firebase'
 import { cn } from '../utils/cn'
 
 function GoogleIcon() {
@@ -25,6 +27,7 @@ function FacebookIcon() {
 
 export function Login() {
   const { signIn, signingIn } = useAuthStore()
+  const needsFirebase = !isMockMode() && !isFirebaseConfigured()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/'
@@ -66,10 +69,16 @@ export function Login() {
           <h1 className="mt-8 text-headline-lg">Welcome Back</h1>
           <p className="mt-2 text-body-md text-on-surface-variant">Sign in to manage your bookings</p>
 
+          {needsFirebase && (
+            <p className="mt-8 rounded-sm border border-warning/30 bg-warning/10 px-4 py-3 text-label-sm text-warning">
+              Firebase is not configured. Add VITE_FIREBASE_* to enable sign-in, or set VITE_USE_MOCK=true.
+            </p>
+          )}
+
           <div className="mt-10 space-y-4">
             <button
               onClick={() => handleSignIn('google')}
-              disabled={signingIn}
+              disabled={signingIn || needsFirebase}
               className={cn(
                 'flex h-12 w-full items-center justify-center gap-3 rounded-sm bg-white text-label-md font-semibold text-gray-800',
                 'transition-all hover:brightness-95 disabled:opacity-60',
@@ -80,7 +89,7 @@ export function Login() {
             </button>
             <button
               onClick={() => handleSignIn('facebook')}
-              disabled={signingIn}
+              disabled={signingIn || needsFirebase}
               className={cn(
                 'flex h-12 w-full items-center justify-center gap-3 rounded-sm bg-[#1877F2] text-label-md font-semibold text-white',
                 'transition-all hover:brightness-110 disabled:opacity-60',

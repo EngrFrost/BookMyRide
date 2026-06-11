@@ -1,0 +1,17 @@
+# Append to ~/infra/Caddyfile on clawd, then:
+#   docker cp ~/infra/Caddyfile caddy-proxy:/tmp/Caddyfile.new
+#   docker exec caddy-proxy caddy validate --config /tmp/Caddyfile.new
+#   docker exec caddy-proxy caddy reload --config /tmp/Caddyfile.new
+bookmyride.crabdance.com {
+    tls {
+        issuer zerossl a2c78f346366f41e0927e73f36bfdcb0
+    }
+
+    handle /api* {
+        reverse_proxy bookmyride-api:3000
+    }
+
+    handle {
+        reverse_proxy bookmyride-web:80
+    }
+}

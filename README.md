@@ -11,9 +11,11 @@ A Progressive Web App (PWA) for browsing and reserving named vehicles (bikes, 4-
 | Layer | Tech |
 |---|---|
 | Frontend | Vite + React 18 + TypeScript, TailwindCSS v3, Zustand, Framer Motion, vite-plugin-pwa |
-| Backend (later phases) | NestJS, Prisma, PostgreSQL, Firebase Auth |
+| Backend | NestJS, Prisma, PostgreSQL, Firebase Auth |
 
 ## Getting started
+
+### Frontend (mock demo — live at https://bookmyride.crabdance.com)
 
 ```bash
 cd client
@@ -21,7 +23,31 @@ npm install
 npm run dev
 ```
 
-The app currently runs entirely on mock data (no backend required). Phases 0–3 are complete: public customer app + full admin dashboard at `/admin` (sign in with Facebook for admin access).
+### Backend (Phase 4+)
+
+```bash
+# From repo root — start Postgres on port 5434
+docker compose up -d
+
+cd server
+cp .env.example .env   # add Firebase service account fields
+npm install
+npx prisma migrate deploy
+npm run prisma:seed
+npm run start:dev
+```
+
+API base: `http://localhost:3000/api`
+
+| Endpoint | Auth |
+|----------|------|
+| `GET /health` | — |
+| `GET /settings` | — |
+| `GET /vehicles` | — |
+| `POST /bookings` | Firebase token |
+| `GET /admin/stats` | Admin |
+
+The frontend still uses mock data (`VITE_USE_MOCK=true`). Phase 6 wires `httpApi.ts`.
 
 Handy while demoing:
 
