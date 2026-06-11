@@ -8,96 +8,114 @@ Design reference: Stitch project **VehicleAppointment** (`4096618961977056422`) 
 
 **Mock-data approach:** All data flows through a `services/api.ts` interface from day one. Phases 0–3 back it with an in-memory mock implementation (`services/mockApi.ts` + `mocks/*.ts` fixtures, simulated latency, persisted to `localStorage` so interactions feel real). Phase 6 swaps the implementation for real HTTP calls — pages and components don't change.
 
+## Status
+
+| Phase | Status |
+|---|---|
+| 0 — Client Scaffolding & Design System | ✅ **Complete** (2026-06-11) |
+| 1 — Static Pages: Public & Auth | ✅ **Complete** (2026-06-11) |
+| 2 — Booking UX | ✅ **Complete** (2026-06-11) |
+| 3 — Admin Dashboard UI | ✅ **Complete** (2026-06-11) |
+| 4 — Backend Foundation | 🔜 Next |
+| 5 — Backend Domain APIs | ⬜ Not started |
+| 6 — Wire Frontend to Backend | ⬜ Not started |
+| 7 — Notifications, PWA & Polish | ⬜ Not started |
+
+First commit pushed to [github.com/EngrFrost/BookMyRide](https://github.com/EngrFrost/BookMyRide).
+
 ---
 
-## Phase 0 — Client Scaffolding & Design System
+## Phase 0 — Client Scaffolding & Design System ✅
 
-> Goal: Vite app running with the Aura Drive theme fully tokenized.
+> Goal: Vite app running with the design theme fully tokenized.
 
 ### Tasks
 
-- [ ] Initialize git repo, `.gitignore`, `README.md`
-- [ ] Scaffold `client/` — Vite + React 18 + TypeScript
-- [ ] TailwindCSS v3 configured with Aura Drive tokens from the Stitch design system:
-  - colors (surface scale, primary `#2d5bff`, secondary violet, tertiary cyan, error, named colors)
-  - typography scale (headline-xl → label-sm, Plus Jakarta Sans via `@fontsource`)
-  - radii (`sm` 0.5rem → `full`), spacing scale (8px base), desktop/mobile margins
-- [ ] Base UI kit in `components/ui/` matching the design system:
-  - `Button` (gradient primary w/ glow hover, ghost, outline), `GlassCard`, `Badge`/`Chip` (status colors), `Input`, `Select`, `Modal`, `Toast`, `Skeleton`, `Avatar`, `Tabs`
-- [ ] React Router v6, Zustand, Framer Motion installed and wired
-- [ ] `vite-plugin-pwa` stub (manifest, theme color `#131314`, placeholder icons)
-- [ ] TypeScript domain types in `types/` mirroring the SPECS Prisma schema (User, Vehicle, Booking, AppSettings, enums)
-- [ ] `services/api.ts` interface + `services/mockApi.ts` skeleton, `mocks/` fixtures folder
+- [x] Initialize git repo, `.gitignore`, `README.md`
+- [x] Scaffold `client/` — Vite + React 18 + TypeScript
+- [x] TailwindCSS v3 configured with the Z Rentals tokens:
+  - colors (deep-black surface scale, primary amber `#e8942d`, secondary electric blue `#1e90ff`, functional success/warning/danger)
+  - typography scale (headline-xl → label-sm, Plus Jakarta Sans via `@fontsource-variable`)
+  - radii (`sm` 0.5rem → `full`), gradient/glow/ambient shadows, glass utilities (`.glass`, `.glass-elevated`)
+- [x] Base UI kit in `components/ui/` matching the design system:
+  - `Button` (gradient primary w/ glow hover, secondary, ghost, outline, danger), `GlassCard`, `Badge` (status tone maps), `Input`, `Select`, `Modal`, `Toast` (zustand store + `toast.*` helpers), `Skeleton`, `Avatar`, `Tabs` (animated indicator)
+- [x] React Router v6, Zustand, Framer Motion installed and wired
+- [x] `vite-plugin-pwa` stub (manifest, theme color `#0a0a14`; final icons in Phase 7)
+- [x] TypeScript domain types in `types/` mirroring the SPECS Prisma schema (User, Vehicle, Booking, AppSettings, enums)
+- [x] `services/api.ts` interface + full `services/mockApi.ts`, `mocks/` fixtures folder
 
-### Exit criteria
+### Exit criteria — met
 
-- A styleguide/dev route renders all UI kit components on the dark glass theme
-- `npm run dev` + `npm run build` clean
+- ✅ `/styleguide` dev route renders the full UI kit on the dark glass theme
+- ✅ `npm run dev` + `npm run build` clean
 
 ---
 
-## Phase 1 — Static Pages: Public & Auth (mock data)
+## Phase 1 — Static Pages: Public & Auth (mock data) ✅
 
 > Goal: all customer-facing pages pixel-faithful to the Stitch screens, fed by fixtures.
 
 ### Tasks
 
-- [ ] App shell: Navbar (logo, links, avatar menu) + Footer from Stitch home screens; mobile nav
-- [ ] **Home** from `.stitch/screens/home-b.html` — hero, category cards, "How it works"
-- [ ] **Sign In** from `.stitch/screens/signin-premium.html` — animated background, Google/Facebook buttons (mock: clicking "signs in" a fixture user, stored in Zustand + localStorage)
-- [ ] **Our Fleet** from `.stitch/screens/fleet-b.html` — vehicle grid, category filter tabs (Bike / 4-Seater / 7-Seater), search, availability/status badges
-- [ ] **Vehicle Detail** from `.stitch/screens/vehicle-detail-zrentals.html` — hero image, specs, calendar + time picker placeholders (interactive in Phase 2)
-- [ ] Mock fixtures: ~8 vehicles across all categories incl. `MAINTENANCE`/`RETIRED`, 2 mock users (customer + admin)
-- [ ] Mock auth store: signed-out/customer/admin states, `RequireAuth`/`RequireAdmin` guards working against mock role
+- [x] App shell: Navbar (logo, links, avatar menu w/ admin link + sign-out) + Footer; mobile hamburger nav
+- [x] **Home** from `.stitch/screens/home-b.html` — hero, category cards, "How it works", CTA strip
+- [x] **Sign In** from `.stitch/screens/signin-premium.html` — animated ambient background, Google/Facebook buttons (mock: Google → customer fixture, Facebook → admin fixture, persisted in localStorage)
+- [x] **Our Fleet** from `.stitch/screens/fleet-b.html` — vehicle grid, category filter tabs (synced to `?category=` URL param), search, availability/status badges, maintenance/retired overlays
+- [x] **Vehicle Detail** from `.stitch/screens/vehicle-detail-zrentals.html` — hero image w/ gradient overlay, badges, full booking panel (Phase 2)
+- [x] Mock fixtures: 8 vehicles across all categories incl. `MAINTENANCE`/`RETIRED`, 4 mock users (customer + admin + extras)
+- [x] Mock auth store: signed-out/customer/admin states, `RequireAuth`/`RequireAdmin` guards working against mock role
+- [x] `/my-bookings` route behind auth guard (booking list in Phase 2); `/admin` stub (Phase 3)
 
-### Exit criteria
+### Exit criteria — met
 
-- Full click-through: Home → Fleet → filter/search → Vehicle Detail; mock sign-in/out toggles navbar state
-- Responsive on mobile/tablet/desktop per Aura Drive layout rules
+- ✅ Full click-through: Home → Fleet → filter/search → Vehicle Detail; mock sign-in/out toggles navbar state
+- ✅ Responsive on mobile/tablet/desktop; verified in browser + production build passes
 
 ---
 
-## Phase 2 — Booking UX (mock data, fully interactive)
+## Phase 2 — Booking UX (mock data, fully interactive) ✅
 
 > Goal: the complete booking experience working against the mock store — rules and all.
 
 ### Tasks
 
-- [ ] **Availability calendar** on Vehicle Detail: booked/free days from mock bookings; disabled past dates and dates beyond max-advance (mock settings)
-- [ ] **Time slot picker**: start time in 1-hour increments, auto-computed +12h end with next-day indicator (e.g. `2:00 PM – 2:00 AM +1`)
-- [ ] **Booking confirmation modal**: summary → confirm → success state with toast
-- [ ] **My Bookings** from `.stitch/screens/my-bookings-zrentals.html` — upcoming vs. past grouping, status badges, cancel flow with confirmation dialog
-- [ ] Implement booking rules **in the mock API** (same rules the backend will enforce later):
+- [x] **Availability calendar** (`components/booking/AvailabilityCalendar.tsx`) — month navigation, free/partial/full/disabled day states from mock bookings + `AppSettings` (24h lead, 7-day advance)
+- [x] **Time slot picker** (`components/booking/TimeSlotPicker.tsx`) — hourly start times, overlap filtering, +12h window preview with next-day indicator
+- [x] **Booking panel** (`components/booking/BookingPanel.tsx`) — wires calendar + picker on Vehicle Detail; sign-in gate; confirm flow
+- [x] **Booking confirmation modal** (`components/booking/BookingConfirmationModal.tsx`) — summary → confirm → toast → redirect to My Bookings
+- [x] **My Bookings** (`pages/MyBookings.tsx`) — filter tabs (All / Upcoming / Completed / Cancelled), `BookingCard` grid, cancel modal with optional reason, rebook link for cancelled
+- [x] **Date utilities** (`utils/dates.ts`) — overlap checks, slot generation, formatting shared with mock API rules
+- [x] Implement booking rules **in the mock API** — *done in Phase 0*:
   - no overlapping windows (real datetime-interval check, incl. cross-midnight)
   - max 7 days advance, max 2 active bookings, min 24h lead time
-  - cancel allowed only >24h before start
-- [ ] Friendly validation errors surfaced as toasts/inline messages
-- [ ] Mock bookings persist to localStorage so the demo survives refresh
+  - cancel allowed only >24h before start (admin bypasses, with reason)
+- [x] Friendly validation errors surfaced as toasts (create/cancel failures from mock API)
+- [x] Mock bookings persist to localStorage — *done in Phase 0* (`window.__resetMockState()` dev helper)
 
-### Exit criteria
+### Exit criteria — met
 
-- End-to-end mock booking: pick vehicle → date → window → confirm → appears in My Bookings → cancel frees the slot
-- All rule violations blocked with clear messaging
+- ✅ End-to-end mock booking: pick vehicle → date → window → confirm → appears in My Bookings → cancel frees the slot
+- ✅ Rule violations blocked with clear toast messaging (overlap, lead time, max active, cancellation window)
 
 ---
 
-## Phase 3 — Admin Dashboard UI (mock data)
+## Phase 3 — Admin Dashboard UI (mock data) ✅
 
 > Goal: full `/admin` area working against the mock store.
 
 ### Tasks
 
-- [ ] Admin layout from `.stitch/screens/admin-dashboard-zrentals.html` — sidebar nav, header, role-gated routes
-- [ ] **Dashboard Home**: stats cards (today's/upcoming bookings, active vehicles, users) + simple chart (bookings per day) from mock data
-- [ ] **Vehicle Management**: data table, create/edit modal, status changes, image URL field (real upload comes with backend)
-- [ ] **Booking Management**: all-bookings table — filter by date/vehicle/status, cancel with reason, mark `NO_SHOW`
-- [ ] **User Management**: users table, promote/demote role, enable/disable
-- [ ] **Settings**: form for max advance days, max active bookings, lead time, cancellation window — changes immediately affect mock booking validation
+- [x] Admin layout (`components/admin/AdminLayout.tsx`) — sidebar nav, mobile drawer, header, separate from public `Layout`; nested routes under `/admin`
+- [x] **Dashboard Home** (`pages/admin/Dashboard.tsx`) — stat cards, today's bookings table, 7-day bar chart via `getAdminStats()`
+- [x] **Vehicle Management** (`pages/admin/ManageVehicles.tsx`) — data table, create/edit modal, delete, image URL field
+- [x] **Booking Management** (`pages/admin/ManageBookings.tsx`) — filter by status/vehicle/date, admin cancel with reason, mark `NO_SHOW`
+- [x] **User Management** (`pages/admin/ManageUsers.tsx`) — promote/demote role, enable/disable (self-guarded)
+- [x] **Settings** (`pages/admin/Settings.tsx`) — booking rules form; changes persist to mock store and affect validation immediately
 
-### Exit criteria
+### Exit criteria — met
 
-- Full admin ops loop on mock data: add vehicle → customer books it → admin cancels with reason → customer sees cancellation
-- **Frontend demo complete** — the whole app is click-through-able with zero backend
+- ✅ Full admin ops loop on mock data: add vehicle → customer books it → admin cancels with reason → customer sees cancellation
+- ✅ **Frontend demo complete** — entire app click-through-able with zero backend
 
 ---
 

@@ -21,4 +21,11 @@ npm install
 npm run dev
 ```
 
-The app currently runs entirely on mock data (no backend required). See the plan for phase status.
+The app currently runs entirely on mock data (no backend required). Phases 0–3 are complete: public customer app + full admin dashboard at `/admin` (sign in with Facebook for admin access).
+
+Handy while demoing:
+
+- **Mock sign-in**: "Continue with Google" signs in a customer; "Continue with Facebook" signs in an admin (access `/admin`).
+- **Reset demo data**: run `window.__resetMockState()` in the browser console.
+
+See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for full phase status.

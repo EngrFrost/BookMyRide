@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { api } from '../services/api'
 import type { Vehicle } from '../types'
 import { VEHICLE_CATEGORY_LABELS, VEHICLE_STATUS_LABELS } from '../types'
+import { BookingPanel } from '../components/booking'
 import { Badge, GlassCard, Skeleton, vehicleStatusTone } from '../components/ui'
 
 export function VehicleDetail() {
@@ -82,7 +83,6 @@ export function VehicleDetail() {
             </div>
           </div>
 
-          {/* Booking panel — interactive calendar + time picker arrive in Phase 2 */}
           <GlassCard elevated className="mt-8 p-6 md:p-10">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <h2 className="text-headline-md text-primary">Book This Vehicle</h2>
@@ -90,22 +90,7 @@ export function VehicleDetail() {
             </div>
 
             {vehicle.status === 'AVAILABLE' ? (
-              <div className="mt-8 grid gap-8 lg:grid-cols-2">
-                <div className="glass flex aspect-square max-h-96 items-center justify-center p-8 text-center lg:aspect-auto">
-                  <div>
-                    <p className="text-headline-sm text-on-surface-variant">Availability calendar</p>
-                    <p className="mt-2 text-body-md text-on-surface-variant/70">Coming in Phase 2</p>
-                  </div>
-                </div>
-                <div className="glass flex items-center justify-center p-8 text-center">
-                  <div>
-                    <p className="text-headline-sm text-on-surface-variant">Start-time picker</p>
-                    <p className="mt-2 text-body-md text-on-surface-variant/70">
-                      Pick a start time — the end time is auto-calculated (+12h). Coming in Phase 2.
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <BookingPanel vehicle={vehicle} />
             ) : (
               <p className="mt-6 text-body-md text-on-surface-variant">
                 This vehicle is currently{' '}
