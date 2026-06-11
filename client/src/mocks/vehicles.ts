@@ -1,0 +1,88 @@
+import type { Vehicle } from '../types'
+
+const now = new Date().toISOString()
+
+// Image URLs are royalty-free Unsplash photos used as placeholders until
+// real fleet photography is uploaded via the admin panel (Phase 5).
+export const mockVehicles: Vehicle[] = [
+  {
+    id: 'veh-vios-1',
+    name: 'Toyota Vios #1',
+    category: 'FOUR_SEATER',
+    description: 'Compact sedan, automatic transmission. Fuel-efficient and easy to drive around the city.',
+    imageUrl: 'https://images.unsplash.com/photo-1590362891991-f776e747a588?w=1280&q=80',
+    status: 'AVAILABLE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-vios-2',
+    name: 'Toyota Vios #2',
+    category: 'FOUR_SEATER',
+    description: 'Compact sedan, automatic transmission. Pearl white finish.',
+    imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1280&q=80',
+    status: 'AVAILABLE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-mirage-1',
+    name: 'Mitsubishi Mirage G4 #1',
+    category: 'FOUR_SEATER',
+    description: 'Subcompact sedan, automatic. Great fuel economy for long drives.',
+    imageUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1280&q=80',
+    status: 'MAINTENANCE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-innova-1',
+    name: 'Toyota Innova #1',
+    category: 'SEVEN_SEATER',
+    description: 'Spacious 7-seater MPV, diesel, automatic. Perfect for family trips.',
+    imageUrl: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1280&q=80',
+    status: 'AVAILABLE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-avanza-1',
+    name: 'Toyota Avanza #1',
+    category: 'SEVEN_SEATER',
+    description: '7-seater compact MPV, automatic. Nimble in the city with room for everyone.',
+    imageUrl: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1280&q=80',
+    status: 'AVAILABLE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-nmax-1',
+    name: 'Yamaha NMAX #1',
+    category: 'BIKE',
+    description: '155cc automatic scooter. Comfortable commuter with ample storage.',
+    imageUrl: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=1280&q=80',
+    status: 'AVAILABLE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-click-1',
+    name: 'Honda Click 125i #1',
+    category: 'BIKE',
+    description: '125cc automatic scooter. Lightweight and fuel-efficient.',
+    imageUrl: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=1280&q=80',
+    status: 'AVAILABLE',
+    createdAt: now,
+    updatedAt: now,
+  },
+  {
+    id: 'veh-xrm-1',
+    name: 'Honda XRM 125 #1',
+    category: 'BIKE',
+    description: '125cc underbone. Retired from the active fleet.',
+    imageUrl: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=1280&q=80',
+    status: 'RETIRED',
+    createdAt: now,
+    updatedAt: now,
+  },
+]

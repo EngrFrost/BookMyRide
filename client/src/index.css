@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-background text-on-surface antialiased;
+    color-scheme: dark;
+  }
+
+  body {
+    @apply font-sans text-body-md min-h-screen;
+  }
+
+  ::selection {
+    @apply bg-primary text-primary-on;
+  }
+}
+
+@layer components {
+  /* Glassmorphic surface — translucent fill, blur, light-catching top edge */
+  .glass {
+    @apply bg-white/[0.06] backdrop-blur-glass border border-white/[0.14] rounded-md;
+    border-top-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .glass-elevated {
+    @apply bg-white/[0.09] backdrop-blur-glass border border-white/[0.18] rounded-md shadow-ambient;
+    border-top-color: rgba(255, 255, 255, 0.28);
+  }
+}
+
+@layer utilities {
+  .text-gradient-primary {
+    @apply bg-gradient-primary bg-clip-text text-transparent;
+  }
+}
